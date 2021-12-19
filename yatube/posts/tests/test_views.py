@@ -8,7 +8,7 @@ from django.db.utils import IntegrityError
 
 from posts.forms import PostForm
 from posts.models import Post, Group, User, Follow
-from yatube.settings import POSTS_PER_PAGE, CACHES
+from yatube.settings import POSTS_PER_PAGE
 
 
 class MyBaseUnitTest(TestCase):
@@ -44,7 +44,7 @@ class MyBaseUnitTest(TestCase):
 
 
 class YatubeViewsTests(MyBaseUnitTest):
-    
+
     def check_uses_correct_template(self, clnt, dict):
         for template, reverse_name in dict.items():
             with self.subTest(reverse_name=reverse_name):
@@ -158,7 +158,7 @@ class YatubeViewsTests(MyBaseUnitTest):
                 cache.clear()
                 response = self.guest_client.get(reverse_name)
                 self.assertContains(response, 'img')
-    
+
     def test_do_not_accept_user_to_follow_itself(self):
         with self.assertRaises(IntegrityError):
             Follow.objects.create(user=self.user1, author=self.user1)
@@ -172,9 +172,9 @@ class YatubeViewsTests(MyBaseUnitTest):
         url = reverse('posts:index')
         response_real = self.authorized_client.get(url)
         Post.objects.all().delete()
-        response_cached = self.authorized_client.get(url)   
+        response_cached = self.authorized_client.get(url)
         self.assertEqual(response_real.content, response_cached.content)
-                
+
 
 class YatubePaginatorTests(MyBaseUnitTest):
     def multiple_posts(self):

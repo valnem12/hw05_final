@@ -1,4 +1,4 @@
-from PIL import ImageFilter, Image, ImageOps, ImageEnhance, ImageDraw
+from PIL import ImageFilter, Image, ImageDraw
 
 
 def emboss(request):
@@ -24,6 +24,7 @@ def emboss(request):
             return 255
 
         return int(value)
+
     # Sepia is a filter based on exagerating red, yellow and brown tones
     # This implementation exagerates mainly yellow with a little brown
     def get_sepia_pixel(red, green, blue, alpha):
@@ -80,7 +81,7 @@ def emboss(request):
         count = 0
         for i in range(i_start, i_end - 2, 2):
             for j in range(j_start, j_end - 2, 2):
-                count+=1
+                count += 1
                 p = get_pixel(image, i, j)
                 red, green, blue = p[0] + red, p[1] + green, p[2] + blue
 
@@ -90,7 +91,7 @@ def emboss(request):
             green /= count
             blue /= count
         except Exception:
-            pass    
+            pass
 
         # Return color average
         return int(red), int(green), int(blue), alpha
@@ -103,7 +104,8 @@ def emboss(request):
         # Radius
         radius = 3
 
-        # Intentional error on the positionning of dots to create a wave-like effect
+        # Intentional error on the positionning
+        # of dots to create a wave-like effect
         count = 0
         errors = [1, 0, 1, 1, 2, 3, 3, 1, 2, 1]
 
@@ -114,23 +116,26 @@ def emboss(request):
         draw = ImageDraw.Draw(image)
 
         # Draw circles
-        for i in range(0, width, radius+3):
-            for j in range(0, height, radius+3):
+        for i in range(0, width, radius + 3):
+            for j in range(0, height, radius + 3):
                 # Get the color average
-                color = color_average(image, i-radius, j-radius, i+radius, j+radius)
-                
+                color = color_average(image, i - radius, j - radius,
+                                      i + radius, j + radius)
+
                 # Set error in positions for I and J
                 eI = errors[count % len(errors)]
                 count += 1
                 eJ = errors[count % len(errors)]
 
                 # Create circle
-                draw.ellipse((i-radius+eI, j-radius+eJ, i+radius+eI, j+radius+eJ), fill=(color))
+                draw.ellipse((i - radius + eI, j - radius + eJ,
+                              i + radius + eI, j + radius + eJ), fill=(color))
 
         # Return new image
-        return image  
+        return image
 
-    imj_obj = convert_pointilize(convert_sepia(Image.open("static/img//about/brat.png")))
+    imj_obj = convert_pointilize(convert_sepia(
+        Image.open("static/img//about/brat.png")))
     imj_obj.filter(ImageFilter.GaussianBlur(radius=1.63)).show()
     # (ImageEnhance.Brightness(
     #     ImageOps.grayscale(imj_obj)

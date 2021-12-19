@@ -32,15 +32,3 @@ class CommentForm(ModelForm):
         widgets = {
             'text': Textarea(),
         }
-
-
-# class FollowForm(ModelForm):
-#     class Meta:
-#         model = Post
-#         fields = ('author',)
-#         labels = {
-#             'author': ('Автор')
-#         }
-#         help_texts = {
-#             'author': ('Подписаться на:')
-#         }
