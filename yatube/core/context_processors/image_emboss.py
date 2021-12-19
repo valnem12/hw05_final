@@ -135,7 +135,6 @@ def emboss(request):   # noqa
     imj_obj = convert_pointilize(convert_sepia(
         Image.open("static/img//about/brat.png")))
 """
-
     imj_obj = Image.open("static/img/about/zenit_lev.png")
     imj_obj.filter(ImageFilter.GaussianBlur(radius=1.63)).show()
     (ImageEnhance.Brightness(
