@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block tab_title %}
+  {{ tab_title }}
+{% endblock %}
+
+{% block header %}
+  {{ header }}
+{% endblock %}
+
+{% block content %}
+<!-- Blog Entries Column -->
+  {% include 'includes/switcher.html' %}
+  {% for post in page_obj %}
+    {% include 'includes/post_item.html' %}
+    {% include 'includes/detailed_info_url.html' %}
+
+    {% if post.group %}
+      <a href='{% url 'posts:group_list' post.group.slug %}'>
+        все записи группы {{ post.group.title }}
+      </a>
+    {% endif %}
+
+    {% include 'includes/post_break_line.html' %}
+  {% endfor %}  
+  {% include 'includes/paginator.html' %}
+{% endblock %}

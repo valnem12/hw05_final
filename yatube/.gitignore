@@ -1,0 +1,10 @@
+.vscode
+.static
+.static/
+.vscode/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover 
+.media

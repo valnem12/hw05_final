@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% load static %}
+{% block header %}Об авторе проекта{% endblock %}
+{% block content %}
+
+  <h2>Привет</h2>  
+  <body id="bg" style="background-image: url('{% static "img/about/zenit_lev_en3.png" %}')";>
+    <meta name="viewport" content="width=device-width, initial-scale=1">  
+    <div class="container">
+     
+      <div class="element-1">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bg.css' %}"> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Pacifico">
+        <p id="text_main">
+          Я сижу и смотрю в чужое небо из чужого окна<br/>
+          И не вижу ни одной знакомой звезды.<br/>
+          Я ходил по всем дорогам и туда, и сюда,<br/>
+          Обернулся - и не смог разглядеть следы.<br/>
+          <br/>Но если есть в кармане пачка сигарет,<br/>
+          Значит все не так уж плохо на сегодняшний день.<br/>
+          И билет на самолет с серебристым крылом,<br/>
+          Что, взлетая, оставляет земле лишь тень.<br/>
+          <br/>И никто не хотел быть виноватым без вина,<br/>
+          И никто не хотел руками жар загребать,<br/>
+          А без музыки на миру смерть не красна,<br/>
+          А без музыки не хочется пропадать.<br/><br/>
+          Но если есть в кармане пачка сигарет,<br/>
+          Значит все не так уж плохо на сегодняшний день.<br/>
+          И билет на самолет с серебристым крылом,<br/>
+          Что, взлетая, оставляет земле лишь тень.<br/>
+          <h6 id='singer'>Виктор Цой — Пачка сигарет</h6>  
+            <audio controls>
+              <source src="https://musify.club/track/play/1539519/%d0%ba%d0%b8%d0%bd%d0%be-%d0%bf%d0%b0%d1%87%d0%ba%d0%b0-%d1%81%d0%b8%d0%b3%d0%b0%d1%80%d0%b5%d1%82.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+        </p>
+      </div>  
+      <div class="element-2">        
+        <!--body id="bg" style="background-image: {{ emboss }}')";--> 
+          {% thumbnail "about/brat_aged_smoothed2.png" "1920" as big %}
+            {% thumbnail "about/brat_aged_smoothed2.png" "300" upscale=True as small %}
+              <!---img class="card-img" src="{{ big.url }}" src="{{ small.url }}"-->
+              <a href="{{ big.url}}"><img id="author_pic" src="{{ small.url }}"></a>
+            {% endthumbnail %}
+          {% endthumbnail %}
+        </div>        
+    </div>    
+    
+</body>
+{% endblock %}

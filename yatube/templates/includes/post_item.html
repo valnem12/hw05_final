@@ -1,0 +1,29 @@
+
+<!--Repeated Article Elements-->
+
+{% load thumbnail %}
+<article>
+  <ul>  
+    {% url 'posts:index' as homepage %}
+    {% url 'posts:follow_index' as to_author %}
+    {% if request.path == homepage or to_author %}     
+      {% include 'includes/author_posts_url.html'%}  
+    {% endif %}      
+    <li>
+      Дата публикации: {{ post.pub_date|date:'d E Y' }}
+    </li>  
+  </ul>
+  <div class="card mb-3 mt-3 shadow-sm">
+    <p style="text-indent :3em;">
+      {% thumbnail post.image "1000x1000" as big %}
+        {% thumbnail post.image "150x150" crop="center" upscale=True as small %}
+          <!---img class="card-img" src="{{ big.url }}" src="{{ small.url }}"-->
+          <a href="{{ big.url}}"><img src="{{ small.url }}" align="left"></a>
+        {% endthumbnail %}
+      {% endthumbnail %}
+      
+      {{ post.text|linebreaksbr }}
+    </p>
+  </div>  
+</article>
+
