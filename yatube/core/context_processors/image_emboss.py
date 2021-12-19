@@ -1,7 +1,8 @@
-from PIL import ImageFilter, Image, ImageDraw
+from PIL import ImageFilter, ImageOps, ImageEnhance, Image
 
 
 def emboss(request):   # noqa
+    """
     # Create a new image with the given size
     def create_image(i, j):
         image = Image.new("RGB", (i, j), "white")
@@ -83,10 +84,7 @@ def emboss(request):   # noqa
             for j in range(j_start, j_end - 2, 2):
                 count += 1
                 p = get_pixel(image, i, j)
-                red, green, blue = p[0] + red, p[1] + green, p[2] + blue
-
-        # Set color average
-        try:
+                red, green, blue = p[0] + redImage, ImageDraw, 
             red /= count
             green /= count
             blue /= count
@@ -136,10 +134,13 @@ def emboss(request):   # noqa
 
     imj_obj = convert_pointilize(convert_sepia(
         Image.open("static/img//about/brat.png")))
+"""
+
+    imj_obj = Image.open("static/img/about/zenit_lev.png")
     imj_obj.filter(ImageFilter.GaussianBlur(radius=1.63)).show()
-    # (ImageEnhance.Brightness(
-    #     ImageOps.grayscale(imj_obj)
-    #     .filter(ImageFilter.GaussianBlur(radius=2.3))
-    #     .filter(ImageFilter.EMBOSS)).enhance(2)
-    #     .filter(ImageFilter.SMOOTH()).show())
+    (ImageEnhance.Brightness(
+        ImageOps.grayscale(imj_obj)
+        .filter(ImageFilter.GaussianBlur(radius=2.3))
+        .filter(ImageFilter.EMBOSS)).enhance(2)
+        .filter(ImageFilter.SMOOTH()).show())
     return {'emboss': imj_obj.filter(ImageFilter.EMBOSS)}
