@@ -79,15 +79,12 @@ class YatubeURLTests(TestCase):
         for clnt, dict in zip(clients, templates):
             self.templates_check(clnt, dict)
 
-    def test_redirect(self):        
+    def test_redirect(self):
         template = f'/posts/{self.post.pk}/edit/'
         response = self.guest_client.get(template)
         expected_url = '/auth/login/'
-        self.assertRedirects(response, expected_url, 
-                            status_code=302, 
-                            target_status_code=200,
-                            msg_prefix='',
-                            fetch_redirect_response=True)
-
-        
-
+        self.assertRedirects(response, expected_url,
+                             status_code=302,
+                             target_status_code=200,
+                             msg_prefix='',
+                             fetch_redirect_response=True)
