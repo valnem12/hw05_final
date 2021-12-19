@@ -1,7 +1,7 @@
 from PIL import ImageFilter, Image, ImageDraw
 
 
-def emboss(request):
+def emboss(request):   # noqa
     # Create a new image with the given size
     def create_image(i, j):
         image = Image.new("RGB", (i, j), "white")
