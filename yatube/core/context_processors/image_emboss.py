@@ -84,7 +84,7 @@ def emboss(request):   # noqa
             for j in range(j_start, j_end - 2, 2):
                 count += 1
                 p = get_pixel(image, i, j)
-                red, green, blue = p[0] + redImage, ImageDraw, 
+                red, green, blue = p[0] + redImage, ImageDraw,
             red /= count
             green /= count
             blue /= count
