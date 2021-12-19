@@ -8,7 +8,7 @@ def emboss(request):   # noqa
         return image
 
     # Get the pixel from the given image
-    def get_pixel(image, i, j):
+    def get_pixel(image, i, j):   # noqa
         # Inside image bounds?
         width, height = image.size
         if i > width or j > height:
@@ -19,7 +19,7 @@ def emboss(request):   # noqa
         return pixel
 
     # Limit maximum value to 255
-    def get_max(value):
+    def get_max(value):    # noqa
         if value > 255:
             return 255
 
@@ -27,7 +27,7 @@ def emboss(request):   # noqa
 
     # Sepia is a filter based on exagerating red, yellow and brown tones
     # This implementation exagerates mainly yellow with a little brown
-    def get_sepia_pixel(red, green, blue, alpha):
+    def get_sepia_pixel(red, green, blue, alpha):   # noqa
         # This is a really popular implementation
         tRed = get_max((0.759 * red) + (0.398 * green) + (0.194 * blue))
         tGreen = get_max((0.676 * red) + (0.354 * green) + (0.173 * blue))
@@ -37,7 +37,7 @@ def emboss(request):   # noqa
         return tRed, tGreen, tBlue, alpha
 
     # Convert an image to sepia
-    def convert_sepia(image):
+    def convert_sepia(image):   # noqa
         # Get size
         width, height = image.size
 
@@ -55,7 +55,7 @@ def emboss(request):   # noqa
         return new
 
     # Return the color average
-    def color_average(image, i0, j0, i1, j1):
+    def color_average(image, i0, j0, i1, j1):   # noqa
         # Colors
         red, green, blue, alpha = 0, 0, 0, 255
 
@@ -97,7 +97,7 @@ def emboss(request):   # noqa
         return int(red), int(green), int(blue), alpha
 
     # Create a Pointilize version of the image
-    def convert_pointilize(image):
+    def convert_pointilize(image):    # noqa
         # Get size
         width, height = image.size
 
