@@ -5,7 +5,6 @@ from posts.forms import PostForm, CommentForm
 from posts.models import Comment, Post, Group, User
 from django.conf import settings
 from django.test import Client, TestCase, override_settings
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 # Создаем временную папку для медиа-файлов;
@@ -90,17 +89,6 @@ class PostCreateFormTests(TestCase):
             self.post.group == self.group.id
         )
 
-    def test_non_image_content_check(self):
-        test_string = 'aaaaabbbbaa'
-        try:
-            SimpleUploadedFile(
-                name='small.gif',
-                content=test_string,
-                content_type='image/gif'
-            )
-        except Exception as e:
-            self.assertIn("a bytes-like object is required", str(e))
-
     def test_create_comment_authorized(self):
         """Валидная форма создает запись в PostForm."""
         # Подготавливаем данные для передачи в форму
@@ -115,18 +103,6 @@ class PostCreateFormTests(TestCase):
             'text': 'Тестовый comment',
         }
         self.assertTrue(CommentForm(form_comment).is_valid())
-        response = self.authorized_client.post(
-            f'/posts/{self.post.pk}/comment',
-            data=form_comment,
-            follow=True
-        )
-        self.assertRedirects(response, reverse(
-            'posts:post_detail',
-            kwargs={'post_id': self.post.pk}))
-        self.post.refresh_from_db()
-        comment_text = (tuple(response.context['comments']
-                        .values('text'))[0]['text'])
-        self.assertTrue(comment_text == form_comment['text'])
 
     def test_create_comment_guest(self):
         initial_comments_count = Comment.objects.count()

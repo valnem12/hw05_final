@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.urls import reverse
 
 from posts.models import Post, Group
 
@@ -41,6 +42,7 @@ class YatubeURLTests(TestCase):
                                        or f'/posts/{cls.post.pk}/edit/'),
             'users/password_change_done.html': '/auth/password_change/done/',
             'users/password_change.html': '/auth/password_change/',
+            'posts/follow.html': '/follow/',
         }
 
     def setUp(self):
@@ -79,12 +81,25 @@ class YatubeURLTests(TestCase):
         for clnt, dict in zip(clients, templates):
             self.templates_check(clnt, dict)
 
-    def test_redirect(self):
-        template = f'/posts/{self.post.pk}/edit/'
-        response = self.guest_client.get(template)
-        expected_url = '/auth/login/'
+    def redirections(self, url, expected_url):
+        response = self.guest_client.get(url)
         self.assertRedirects(response, expected_url,
-                             status_code=302,
-                             target_status_code=200,
+                             status_code=HTTPStatus.FOUND,
+                             target_status_code=HTTPStatus.OK,
                              msg_prefix='',
                              fetch_redirect_response=True)
+
+    def test_redirects(self):
+        urls = [reverse('posts:post_edit', args=(self.post.pk,)),
+                reverse('posts:add_comment', args=(self.post.pk,)),
+                reverse('posts:profile_follow', args=(self.post.author,)),
+                reverse('posts:profile_unfollow', args=(self.post.author,))
+                ]
+        expected_url = [
+            '/auth/login/', '/auth/login/',
+            f'/auth/login/?next=/profile/{self.post.author}/follow/',
+            f'/auth/login/?next=/profile/{self.post.author}/unfollow/'
+        ]
+        for template, url in zip(expected_url, urls):
+            with self.subTest(address=url):
+                self.redirections(url, template)

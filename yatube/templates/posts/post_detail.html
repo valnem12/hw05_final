@@ -16,7 +16,7 @@
             {% if post_by_text_id.group.title %}
               Группа: <strong>{{ post_by_text_id.group.title|upper }}</strong>
               <a href="{% url 'posts:group_list' post_by_text_id.group.slug %}">
-                все записи группы
+                все посты группы
               </a>
             {% else %}              
               <strong>Пост не относится ни к одной группе</strong>
@@ -64,7 +64,7 @@
             <form method="post" action="{% url 'posts:add_comment' post_by_text_id.id %}">
               {% csrf_token %}      
               <div class="form-group mb-2">
-                {{ form.text|addclass:"form-control" }}
+                {{ form.text|addclass:"form-control"|linebreaks }}
               </div>
               <button type="submit" class="btn btn-primary">Отправить</button>
             </form>
@@ -81,7 +81,7 @@
                 </a>
                 ,&nbsp on: {{ comment.created|date:'d E Y' }}
               </h5>
-              <p>{{ comment.text }}</p>
+              <p>{{ comment.text|linebreaksbr }}</p>
             </div>
           </div>
         {% endfor %} 

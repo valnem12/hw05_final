@@ -6,7 +6,7 @@
   <ul>  
     {% url 'posts:index' as homepage %}
     {% url 'posts:follow_index' as to_author %}
-    {% if request.path == homepage or to_author %}     
+    {% if request.path == homepage %}     
       {% include 'includes/author_posts_url.html'%}  
     {% endif %}      
     <li>

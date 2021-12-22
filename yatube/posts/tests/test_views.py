@@ -17,6 +17,8 @@ class MyBaseUnitTest(TestCase):
         super().setUpClass()
         # Создадим запись в БД для проверки доступности адреса
         cls.user = User.objects.create_user(username='shuki')
+        cls.user1 = User.objects.create_user(username='newuser')
+        cls.user2 = User.objects.create_user(username='newuser2')
         cls.group = Group.objects.create(
             title='supergroup',
             slug='supergroup_8u8907272363',
@@ -36,11 +38,12 @@ class MyBaseUnitTest(TestCase):
         cls.NUMBER_OF_PAGES = ceil(cls.NUM_OF_POSTS / POSTS_PER_PAGE)
 
     def setUp(self):
+        cache.clear()
         self.guest_client = Client()
         self.authorized_client = Client()
+        self.auth_following = Client()
         self.authorized_client.force_login(self.user)
-        self.user1 = User.objects.create_user(username='newuser')
-        self.user2 = User.objects.create_user(username='newuser2')
+        self.auth_following.force_login(self.user1)
 
 
 class YatubeViewsTests(MyBaseUnitTest):
@@ -48,7 +51,6 @@ class YatubeViewsTests(MyBaseUnitTest):
     def check_uses_correct_template(self, clnt, dict):
         for template, reverse_name in dict.items():
             with self.subTest(reverse_name=reverse_name):
-                cache.clear()
                 response = clnt.get(reverse_name, follow=True)
                 self.assertTemplateUsed(response, template)
 
@@ -100,7 +102,6 @@ class YatubeViewsTests(MyBaseUnitTest):
 
     def test_index_shows_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
-        cache.clear()
         response = self.guest_client.get(reverse('posts:index'))
         self.author_exists_check(response, 'post')
         self.context_retrieved(response)
@@ -155,8 +156,7 @@ class YatubeViewsTests(MyBaseUnitTest):
                 )
         for reverse_name in urls:
             with self.subTest(reverse_name=reverse_name):
-                cache.clear()
-                response = self.guest_client.get(reverse_name)
+                response = self.authorized_client.get(reverse_name)
                 self.assertContains(response, 'img')
 
     def test_do_not_accept_user_to_follow_itself(self):
@@ -167,6 +167,37 @@ class YatubeViewsTests(MyBaseUnitTest):
         Follow.objects.create(user=self.user1, author=self.user2)
         with self.assertRaises(IntegrityError):
             Follow.objects.create(user=self.user1, author=self.user2)
+
+    def test_follow(self):
+        following_pre = Follow.objects.all().count()
+        self.auth_following.get(
+            reverse('posts:profile_follow',
+                    args=(self.post.author,))
+        )
+        following_post = Follow.objects.all().count()
+        self.assertEqual(following_pre + 1, following_post)
+
+    def test_unfollow(self):
+        following_pre = Follow.objects.all().count()
+        self.auth_following.get(
+            reverse('posts:profile_follow',
+                    args=(self.post.author,))
+        )
+        self.auth_following.get(
+            reverse('posts:profile_unfollow',
+                    args=(self.post.author,))
+        )
+        following_post = Follow.objects.all().count()
+        self.assertEqual(following_pre, following_post)
+
+    def test_add_comment(self):
+        self.authorized_client.post(reverse('posts:add_comment',
+                                            args=(self.post.pk,)),
+                                    {'text': 'new comment'})
+        response = self.authorized_client.get(reverse(
+            'posts:post_detail',
+            kwargs={'post_id': self.post.pk}))
+        self.assertContains(response, 'new comment')
 
     def test_cache(self):
         url = reverse('posts:index')
@@ -191,7 +222,6 @@ class YatubePaginatorTests(MyBaseUnitTest):
                 ]
         for reverse_name in urls:
             with self.subTest(reverse_name=reverse_name):
-                cache.clear()
                 response = self.authorized_client.get(reverse_name)
                 self.assertEqual(response.context['page_obj']
                                  .paginator.num_pages, self.NUMBER_OF_PAGES)

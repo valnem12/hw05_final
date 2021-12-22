@@ -1,6 +1,3 @@
-from urllib.parse import urlencode
-
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -8,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.cache import cache_page
 from django.urls import reverse
 from django.db import IntegrityError
-
 
 from .models import Post, Group, Follow
 from .forms import PostForm, CommentForm
@@ -29,7 +25,7 @@ def index(request):
     """Main page - dispalying the latest ten posts."""
 
     template = 'posts/index.html'
-    posts = Post.objects.all()
+    posts = Post.objects.select_related('author', 'group')
     page_obj = _pagination(request, posts)
     context = {
         'page_obj': page_obj
@@ -56,10 +52,14 @@ def profile(request, username):
     template = 'posts/profile.html'
     author = get_object_or_404(User, username=username)
     posts_by_author = author.posts.all()
+    try:
+        following = bool(author.following.filter(user=request.user))
+    except Exception:
+        following = False
     context = {
         'author': author,
         'page_obj': _pagination(request, posts_by_author),
-        'following': bool(request.GET.get('following'))
+        'following': following
     }
     return render(request, template, context)
 
@@ -88,7 +88,9 @@ def post_create(request):
         post.author = request.user
         post.save()
         return redirect('posts:profile', username=request.user)
-    return render(request, 'posts/post_create.html', {'form': form})
+    return render(request,
+                  'posts/post_create.html',
+                  {'form': form, 'is_edit': False})
 
 
 @login_required(redirect_field_name=None)
@@ -126,7 +128,8 @@ def add_comment(request, post_id):
 def follow_index(request):
     template = 'posts/follow.html'
     authors_following = (Post.objects
-                         .filter(author__following__user=request.user))
+                         .filter(author__following__user=request.user)
+                         .select_related('author', 'group'))
     page_obj = _pagination(request, authors_following)
     context = {
         'page_obj': page_obj
@@ -136,18 +139,19 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    url = reverse('posts:profile', args=(username,))
     author_obj = User.objects.get(username=username)
     try:
         Follow.objects.create(user=request.user, author=author_obj)
-        url = '{}?{}'.format(url, urlencode({'following': True}))
     except IntegrityError:
         pass
-    return redirect(url)
+    return redirect(reverse('posts:profile', args=(username,)))
 
 
 @login_required
 def profile_unfollow(request, username):
-    author = User.objects.get(username=username)
-    author.following.all().delete()
+    try:
+        author = User.objects.get(username=username)
+        author.following.filter(user=request.user).delete()
+    except Exception:
+        print('No such user')
     return redirect('posts:profile', username=username)

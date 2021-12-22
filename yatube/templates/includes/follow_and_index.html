@@ -10,13 +10,15 @@
 
 {% block content %}
 <!-- Blog Entries Column -->
-  {% include 'includes/switcher.html' %}
+  {% if user.is_authenticated %}
+    {% include 'includes/switcher.html' %}
+  {% endif %}  
   {% for post in page_obj %}
     {% include 'includes/post_item.html' %}
     {% include 'includes/detailed_info_url.html' %}
 
     {% if post.group %}
-      <a href='{% url 'posts:group_list' post.group.slug %}'>
+      <a href='{% url "posts:group_list" post.group.slug %}'>
         все записи группы {{ post.group.title }}
       </a>
     {% endif %}
