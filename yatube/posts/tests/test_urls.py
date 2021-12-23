@@ -81,8 +81,9 @@ class YatubeURLTests(TestCase):
         for clnt, dict in zip(clients, templates):
             self.templates_check(clnt, dict)
 
-    def redirections(self, url, expected_url):
+    def redirections(self, url):
         response = self.guest_client.get(url)
+        expected_url = '/auth/login/'
         self.assertRedirects(response, expected_url,
                              status_code=HTTPStatus.FOUND,
                              target_status_code=HTTPStatus.OK,
@@ -95,11 +96,6 @@ class YatubeURLTests(TestCase):
                 reverse('posts:profile_follow', args=(self.post.author,)),
                 reverse('posts:profile_unfollow', args=(self.post.author,))
                 ]
-        expected_url = [
-            '/auth/login/', '/auth/login/',
-            f'/auth/login/?next=/profile/{self.post.author}/follow/',
-            f'/auth/login/?next=/profile/{self.post.author}/unfollow/'
-        ]
-        for template, url in zip(expected_url, urls):
+        for url in urls:
             with self.subTest(address=url):
-                self.redirections(url, template)
+                self.redirections(url)

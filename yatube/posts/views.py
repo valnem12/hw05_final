@@ -25,7 +25,7 @@ def index(request):
     """Main page - dispalying the latest ten posts."""
 
     template = 'posts/index.html'
-    posts = Post.objects.select_related('author', 'group')
+    posts = Post.objects.select_related('author', 'group').all()
     page_obj = _pagination(request, posts)
     context = {
         'page_obj': page_obj
@@ -124,12 +124,13 @@ def add_comment(request, post_id):
     return redirect('posts:post_detail', post_id=post_id)
 
 
-@login_required
+@login_required(redirect_field_name=None)
 def follow_index(request):
     template = 'posts/follow.html'
     authors_following = (Post.objects
                          .filter(author__following__user=request.user)
-                         .select_related('author', 'group'))
+                         .select_related('author', 'group')
+                         .all())
     page_obj = _pagination(request, authors_following)
     context = {
         'page_obj': page_obj
@@ -137,7 +138,7 @@ def follow_index(request):
     return render(request, template, context)
 
 
-@login_required
+@login_required(redirect_field_name=None)
 def profile_follow(request, username):
     author_obj = User.objects.get(username=username)
     try:
@@ -147,7 +148,7 @@ def profile_follow(request, username):
     return redirect(reverse('posts:profile', args=(username,)))
 
 
-@login_required
+@login_required(redirect_field_name=None)
 def profile_unfollow(request, username):
     try:
         author = User.objects.get(username=username)

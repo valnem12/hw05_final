@@ -9,7 +9,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', include('posts.urls', namespace='posts')),
-    path('auth/', include('posts.urls', namespace='posts1')),
     path('auth/', include('users.urls', namespace='users')),
     path('about/', include('about.urls', namespace='about')),
     path('auth/', include('django.contrib.auth.urls')),
